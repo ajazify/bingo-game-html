@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Stylized Bingo Board with Celebration</title>
   <style>
-    /* Basic styles */
+    /* Basic Styles */
     body {
       display: flex;
       align-items: center;
@@ -14,10 +14,21 @@
       margin: 0;
       background-color: #f8f9fa;
       font-family: Arial, sans-serif;
+      user-select: none; /* Disable text selection */
     }
 
     .container {
       text-align: center;
+    }
+
+    .title {
+      font-size: 4rem;
+      font-weight: bold;
+      color: #2c3e50;
+      margin-bottom: 10px;
+      text-transform: uppercase;
+      text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.3);
+      font-family: 'Verdana', sans-serif;
     }
 
     .bingo-board {
@@ -78,7 +89,7 @@
 
     /* Enhanced Celebration Popup */
     .celebration-popup {
-      display: none; /* Hidden by default */
+      display: none;
       position: fixed;
       top: 0;
       left: 0;
@@ -174,11 +185,25 @@
         opacity: 0;
       }
     }
+
+    /* Footer Text */
+    .footer {
+      font-size: 1rem;
+      color: #6c757d;
+      margin-top: 20px;
+      font-style: italic;
+    }
+
+    .footer span {
+      color: #ff4757;
+      font-weight: bold;
+    }
   </style>
 </head>
-<body>
+<body> 
 
   <div class="container">
+    <!-- <h1>Black Mamba</h1> -->
     <div class="bingo-board" id="bingoBoard"></div>
     <div class="bingo-title">
       <span class="bingo-letter" id="letter-B">B</span>
@@ -187,13 +212,14 @@
       <span class="bingo-letter" id="letter-G">G</span>
       <span class="bingo-letter" id="letter-O">O</span>
     </div>
+    <div class="footer">Made with <span>❤️</span> by Muhammed Ajas A A</div>
   </div>
 
   <!-- Celebration Popup -->
   <div class="celebration-popup" id="celebrationPopup">
     <div class="popup-content">
       <h2>🎉 Bingo Completed! 🎉</h2>
-      <p>Congratulations! You completed a Bingo line.</p>
+      <p>Congratulations! You are the Black Mamba.</p>
       <button onclick="closePopup()">Close</button>
     </div>
   </div>
@@ -241,28 +267,28 @@
       const row = Math.floor(index / 5);
       const col = index % 5;
 
-      if (!lineChecks.rows[row] && [0, 1, 2, 3, 4].every(i => cells[row * 5 + i].classList.contains("active"))) {
+      if (!lineChecks.rows[row] && Array.from({ length: 5 }, (_, i) => cells[row * 5 + i]).every(c => c.classList.contains("active"))) {
         lineChecks.rows[row] = true;
-        updateBingoTitle();
+        updateBingoLetters();
       }
 
-      if (!lineChecks.columns[col] && [0, 5, 10, 15, 20].every(i => cells[col + i].classList.contains("active"))) {
+      if (!lineChecks.columns[col] && Array.from({ length: 5 }, (_, i) => cells[i * 5 + col]).every(c => c.classList.contains("active"))) {
         lineChecks.columns[col] = true;
-        updateBingoTitle();
+        updateBingoLetters();
       }
 
-      if (!lineChecks.diagonals.main && [0, 6, 12, 18, 24].every(i => cells[i].classList.contains("active"))) {
-        lineChecks.diagonals.main = true;
-        updateBingoTitle();
+      if (!lineChecks.diagonals["main"] && [0, 6, 12, 18, 24].every(i => cells[i].classList.contains("active"))) {
+        lineChecks.diagonals["main"] = true;
+        updateBingoLetters();
       }
 
-      if (!lineChecks.diagonals.anti && [4, 8, 12, 16, 20].every(i => cells[i].classList.contains("active"))) {
-        lineChecks.diagonals.anti = true;
-        updateBingoTitle();
+      if (!lineChecks.diagonals["anti"] && [4, 8, 12, 16, 20].every(i => cells[i].classList.contains("active"))) {
+        lineChecks.diagonals["anti"] = true;
+        updateBingoLetters();
       }
     }
 
-    function updateBingoTitle() {
+    function updateBingoLetters() {
       const bingoLetters = document.querySelectorAll(".bingo-letter");
       bingoLetters[completedLines].classList.add("selected-color");
       completedLines++;
@@ -273,8 +299,7 @@
     }
 
     function showCelebrationPopup() {
-      const celebrationPopup = document.getElementById("celebrationPopup");
-      celebrationPopup.style.display = "flex";
+      document.getElementById("celebrationPopup").style.display = "flex";
       startConfetti();
     }
 
@@ -286,7 +311,6 @@
     function startConfetti() {
       const confettiContainer = document.getElementById("confetti");
       confettiContainer.innerHTML = "";
-
       for (let i = 0; i < 50; i++) {
         const confetti = document.createElement("div");
         confetti.style.left = `${Math.random() * 100}vw`;
@@ -294,7 +318,7 @@
         confetti.style.animationDuration = `${Math.random() * 2 + 2}s`;
         confettiContainer.appendChild(confetti);
       }
-    }
+    } 
 
     function stopConfetti() {
       document.getElementById("confetti").innerHTML = "";
