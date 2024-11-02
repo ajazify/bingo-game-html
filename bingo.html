@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bingo Board</title>
+  <style>
+    /* Style for the Bingo board container */
+    .bingo-board {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      grid-template-rows: repeat(5, 1fr);
+      width: 300px;
+      height: 300px;
+      gap: 5px;
+      margin: 20px auto;
+    }
+
+    /* Style for each cell */
+    .bingo-cell {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      background-color: #f1f1f1;
+      border: 1px solid #ccc;
+      cursor: pointer;
+      transition: background-color 0.3s;
+      color: #333;
+    }
+
+    /* Style when cell is clicked */
+    .bingo-cell.active {
+      background-color: #333;
+      color: white;
+    }
+
+    /* Style for the BINGO title */
+    .bingo-title {
+      text-align: center;
+      font-size: 3rem;
+      font-weight: bold;
+      color: #333;
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin-top: 20px;
+    }
+
+    /* Initial color for each letter */
+    .bingo-letter {
+      color: #333;
+      transition: color 0.3s;
+    }
+
+    /* Selected color */
+    .selected-color {
+      color: #ff5733; /* Change this color as desired */
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Bingo board container -->
+  <div class="bingo-board" id="bingoBoard"></div>
+
+  <!-- BINGO title below the board -->
+  <div class="bingo-title">
+    <span class="bingo-letter" id="letter-B">B</span>
+    <span class="bingo-letter" id="letter-I">I</span>
+    <span class="bingo-letter" id="letter-N">N</span>
+    <span class="bingo-letter" id="letter-G">G</span>
+    <span class="bingo-letter" id="letter-O">O</span>
+  </div>
+
+  <script>
+    let completedLines = 0; // Track completed rows/columns/diagonals
+    const lineChecks = { rows: {}, columns: {}, diagonals: {} }; // To avoid duplicate checks
+
+    // Function to shuffle an array
+    function shuffle(array) {
+      for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+      }
+      return array;
+    }
+
+    // Function to generate the Bingo board with shuffled numbers from 1 to 25
+    function generateBingoBoard() {
+      const bingoBoard = document.getElementById("bingoBoard");
+
+      // Clear the board if it's not empty
+      bingoBoard.innerHTML = "";
+
+      // Create an array of numbers from 1 to 25 and shuffle it
+      const numbers = shuffle(Array.from({ length: 25 }, (_, i) => i + 1));
+
+      // Loop through the shuffled numbers to create cells
+      numbers.forEach((number, index) => {
+        const cell = document.createElement("div");
+        cell.className = "bingo-cell";
+        cell.innerText = number;
+        cell.onclick = () => {
+          if (!cell.classList.contains("active")) {
+            activateCell(cell, index);
+          }
+        };
+        bingoBoard.appendChild(cell);
+      });
+    }
+
+    // Function to activate cell and check for a completed row/column/diagonal
+    function activateCell(cell, index) {
+      cell.classList.add("active");
+      checkBingoCondition(index);
+    }
+
+    // Function to check for completed rows, columns, or diagonals
+    function checkBingoCondition(index) {
+      const cells = document.querySelectorAll(".bingo-cell");
+      const row = Math.floor(index / 5);
+      const col = index % 5;
+
+      // Check row if not already marked
+      if (!lineChecks.rows[row] && [0, 1, 2, 3, 4].every(i => cells[row * 5 + i].classList.contains("active"))) {
+        lineChecks.rows[row] = true;
+        updateBingoTitle();
+      }
+
+      // Check column if not already marked
+      if (!lineChecks.columns[col] && [0, 5, 10, 15, 20].every(i => cells[col + i].classList.contains("active"))) {
+        lineChecks.columns[col] = true;
+        updateBingoTitle();
+      }
+
+      // Check main diagonal if not already marked
+      if (!lineChecks.diagonals.main && [0, 6, 12, 18, 24].every(i => cells[i].classList.contains("active"))) {
+        lineChecks.diagonals.main = true;
+        updateBingoTitle();
+      }
+
+      // Check anti-diagonal if not already marked
+      if (!lineChecks.diagonals.anti && [4, 8, 12, 16, 20].every(i => cells[i].classList.contains("active"))) {
+        lineChecks.diagonals.anti = true;
+        updateBingoTitle();
+      }
+    }
+
+    // Function to change the color of each letter in "BINGO" based on completed lines
+    function updateBingoTitle() {
+      const bingoLetters = ["letter-B", "letter-I", "letter-N", "letter-G", "letter-O"];
+      
+      // Change color of the next letter only if it hasn’t been changed yet
+      if (completedLines < bingoLetters.length) {
+        const letter = document.getElementById(bingoLetters[completedLines]);
+        letter.classList.add("selected-color");
+        completedLines += 1;
+      }
+    }
+
+    // Generate the Bingo board on page load
+    generateBingoBoard();
+  </script>
+
+</body>
+</html>
